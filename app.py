@@ -35,8 +35,8 @@ def get_args():
                         type=int,
                         default=0.5)
 
-    parser.add_argument("--margin_width", type=float, default=0.10)
-    parser.add_argument("--margin_height", type=float, default=0.10)
+    parser.add_argument("--margin_width", type=float, default=0.2)
+    parser.add_argument("--margin_height", type=float, default=0.2)
 
     args = parser.parse_args()
 
@@ -140,6 +140,10 @@ def main():
                                                     (area_x2 - area_x1)))
                 mouse_y = int(display_size.height * ((cy - area_y1) /
                                                      (area_y2 - area_y1)))
+                mouse_x = 0 if mouse_x < 0 else mouse_x
+                mouse_y = 0 if mouse_y < 0 else mouse_y
+                mouse_x = display_size.width if mouse_x > display_size.width else mouse_x
+                mouse_y = display_size.height if mouse_y > display_size.height else mouse_y
                 if (time.time() - start_time) > 0.2:
                     start_time = time.time()
                     pyautogui.moveTo(mouse_x, mouse_y)
