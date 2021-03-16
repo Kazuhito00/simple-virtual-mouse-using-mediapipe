@@ -1,5 +1,7 @@
 # simple-virtual-mouse-using-mediapipe
-ハンドジェスチャーにて簡単なマウス操作を行うプログラムです<br>
+MediaPipeを用いたハンドジェスチャーによる簡単なマウス操作を行うプログラムです。<br>
+マウス移動：手の移動<br>
+マウス左クリック：手をパーからグーに変える<br><br>
 <img src="https://user-images.githubusercontent.com/37477845/111347926-070d7800-86c3-11eb-851f-22f1e87f67b5.gif" width="75%">
 
 # Requirements
