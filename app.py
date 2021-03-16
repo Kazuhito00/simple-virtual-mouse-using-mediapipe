@@ -35,6 +35,9 @@ def get_args():
                         type=int,
                         default=0.5)
 
+    parser.add_argument("--margin_width", type=float, default=0.10)
+    parser.add_argument("--margin_height", type=float, default=0.10)
+
     args = parser.parse_args()
 
     return args
@@ -52,7 +55,8 @@ def main():
     min_detection_confidence = args.min_detection_confidence
     min_tracking_confidence = args.min_tracking_confidence
 
-    use_brect = True
+    margin_width = args.margin_width
+    margin_height = args.margin_height
 
     # カメラ準備 ###############################################################
     cap = cv.VideoCapture(cap_device)
@@ -82,19 +86,15 @@ def main():
     start_time = time.time()
     cvFpsCalc = CvFpsCalc(buffer_len=10)
 
-    # 座標履歴 #################################################################
-    history_length = 16
-    point_history = deque(maxlen=history_length)
-    prev_hand_sign_id = 0
-
     #  ########################################################################
     display_size = pyautogui.size()
+    prev_hand_sign_id = 0
 
     while True:
         fps = cvFpsCalc.get()
 
         # キー処理(ESC：終了) #################################################
-        key = cv.waitKey(10)
+        key = cv.waitKey(1)
         if key == 27:  # ESC
             break
 
@@ -132,8 +132,14 @@ def main():
                 hand_sign_id = keypoint_classifier(pre_processed_landmark_list)
 
                 # マウス移動
-                mouse_x = int(display_size.width * (cx / image_width))
-                mouse_y = int(display_size.height * (cy / image_height))
+                area_x1 = int(image_width * margin_width)
+                area_y1 = int(image_height * margin_height)
+                area_x2 = image_width - area_x1
+                area_y2 = image_height - area_y1
+                mouse_x = int(display_size.width * ((cx - area_x1) /
+                                                    (area_x2 - area_x1)))
+                mouse_y = int(display_size.height * ((cy - area_y1) /
+                                                     (area_y2 - area_y1)))
                 if (time.time() - start_time) > 0.2:
                     start_time = time.time()
                     pyautogui.moveTo(mouse_x, mouse_y)
@@ -146,7 +152,7 @@ def main():
                     prev_hand_sign_id = hand_sign_id
 
                 # 描画
-                debug_image = draw_bounding_rect(use_brect, debug_image, brect)
+                debug_image = draw_bounding_rect(True, debug_image, brect)
                 debug_image = draw_landmarks(debug_image, landmark_list, cx,
                                              cy)
                 debug_image = draw_info_text(
@@ -155,11 +161,8 @@ def main():
                     handedness,
                     keypoint_classifier_labels[hand_sign_id],
                 )
-        else:
-            point_history.append([0, 0])
 
-        debug_image = draw_point_history(debug_image, point_history)
-        debug_image = draw_info(debug_image, fps)
+        debug_image = draw_info(debug_image, fps, margin_width, margin_height)
 
         # 画面反映 #############################################################
         debug_image = cv.resize(debug_image,
@@ -477,16 +480,16 @@ def draw_info_text(image, brect, handedness, hand_sign_text):
     return image
 
 
-def draw_point_history(image, point_history):
-    for index, point in enumerate(point_history):
-        if point[0] != 0 and point[1] != 0:
-            cv.circle(image, (point[0], point[1]), 1 + int(index / 2),
-                      (152, 251, 152), 2)
+def draw_info(image, fps, margin_width, margin_height):
+    image_width, image_height = image.shape[1], image.shape[0]
 
-    return image
+    area_x1 = int(image_width * margin_width)
+    area_y1 = int(image_height * margin_height)
+    area_x2 = image_width - area_x1
+    area_y2 = image_height - area_y1
+    cv.rectangle(image, (area_x1, area_y1), (area_x2, area_y2),
+                 (255, 255, 255), 2)
 
-
-def draw_info(image, fps):
     cv.putText(image, "FPS:" + str(fps), (10, 30), cv.FONT_HERSHEY_SIMPLEX,
                1.0, (0, 0, 0), 4, cv.LINE_AA)
     cv.putText(image, "FPS:" + str(fps), (10, 30), cv.FONT_HERSHEY_SIMPLEX,
