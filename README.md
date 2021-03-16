@@ -1,0 +1,1 @@
+# simple-virtual-mouse-using-mediapipe
