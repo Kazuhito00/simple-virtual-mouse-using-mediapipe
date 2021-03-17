@@ -24,8 +24,8 @@ python app.py
 検出信頼値の閾値 (デフォルト：0.7)
 * --min_tracking_confidence<br>
 トラッキング信頼値の閾値 (デフォルト：0.5)
-* --margin_width<br>ハンドジェスチャーの操作範囲(横幅のマージン)(デフォルト：0.2)
-* --margin_height<br>ハンドジェスチャーの操作範囲(縦幅のマージン)(デフォルト：0.2)
+* --margin_width<br>ハンドジェスチャーの操作範囲(横幅のマージン割合)(デフォルト：0.2)
+* --margin_height<br>ハンドジェスチャーの操作範囲(縦幅のマージン割合)(デフォルト：0.2)
 
 # Reference
 * [MediaPipe：Hands](https://google.github.io/mediapipe/solutions/hands)
